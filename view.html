@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>맛집 관리 - 상세보기</title>
+  <link rel="stylesheet" href="my.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="container">
+        <h1>🍽 맛집 관리</h1>
+        <nav class="site-nav">
+          <ul>
+            <li><a href="index.html">목록</a></li>
+            <li><a href="add.html">등록</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="card" id="detail-card">
+        <!-- JS로 채워집니다 -->
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 맛집 관리 CRUD Study Project</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const id = getQueryParam("id");
+    const item = getItemById(id);
+    const card = document.getElementById("detail-card");
+
+    if (!item) {
+      card.innerHTML = `
+        <p>존재하지 않는 데이터입니다.</p>
+        <a href="index.html" class="btn btn-secondary">목록으로</a>
+      `;
+    } else {
+      card.innerHTML = `
+        <div class="card-header">
+          <h2>${item.name}</h2>
+          <span>${item.phone}</span>
+        </div>
+        <dl class="detail-list">
+          <dt>전화번호</dt><dd>${item.phone}</dd>
+          <dt>상표명</dt><dd>${item.name}</dd>
+          <dt>카테고리</dt><dd>${getCategoryLabel(item.category)}</dd>
+          <dt>위치</dt><dd>${item.location}</dd>
+          <dt>평점</dt><dd>⭐ ${item.rating}</dd>
+          <dt>영업시간</dt><dd>${item.hours}</dd>
+          <dt>등록일</dt><dd>${item.regDate}</dd>
+        </dl>
+        <div class="card-actions">
+          <a href="index.html" class="btn btn-secondary">목록</a>
+          <a href="edit.html?id=${item.id}" class="btn btn-primary">Edit</a>
+          <button type="button" class="btn btn-danger" id="delete-btn">Delete</button>
+        </div>
+      `;
+
+      document.getElementById("delete-btn").addEventListener("click", () => {
+        if (confirm("게시물을 삭제할까요?")) {
+          deleteItem(item.id);
+          window.location.href = "index.html";
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>맛집 관리 - 목록</title>
+  <link rel="stylesheet" href="my.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="container">
+        <h1>🍽 맛집 관리</h1>
+        <nav class="site-nav">
+          <ul>
+            <li><a href="index.html">목록</a></li>
+            <li><a href="add.html">등록</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="page-title">
+        <h2>맛집 목록</h2>
+        <a href="add.html" class="btn btn-primary">+ Add</a>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>전화번호</th>
+            <th>상표명</th>
+            <th>카테고리</th>
+            <th>위치</th>
+            <th>평점</th>
+            <th>영업시간</th>
+          </tr>
+        </thead>
+        <tbody id="list-body">
+          <!-- JS로 목록이 채워집니다 -->
+        </tbody>
+      </table>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 맛집 관리 CRUD Study Project</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    function renderList() {
+      const list = loadList();
+      const tbody = document.getElementById("list-body");
+      tbody.innerHTML = "";
+
+      // 데이터가 하나도 없으면 안내 문구만 보여주고 함수를 끝냄
+      if (list.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td colspan="6" class="empty-row">
+            등록된 맛집이 없습니다. <a href="add.html">데이터 추가하러가기</a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+        return;
+      }
+
+      list.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.addEventListener("click", () => {
+          window.location.href = `view.html?id=${item.id}`;
+        });
+
+        tr.innerHTML = `
+          <td>${item.phone}</td>
+          <td class="name-cell">${item.name}</td>
+          <td>${getCategoryLabel(item.category)}</td>
+          <td>${item.location}</td>
+          <td>⭐ ${item.rating}</td>
+          <td>${item.hours}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    renderList();
+  </script>
+</body>
+</html>

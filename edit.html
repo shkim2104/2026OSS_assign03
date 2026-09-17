@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>맛집 관리 - 수정</title>
+  <link rel="stylesheet" href="my.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="container">
+        <h1>🍽 맛집 관리</h1>
+        <nav class="site-nav">
+          <ul>
+            <li><a href="index.html">목록</a></li>
+            <li><a href="add.html">등록</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="page-title">
+        <h2>맛집 수정</h2>
+      </div>
+
+      <form class="form-box" id="edit-form" novalidate>
+        <div class="form-row">
+          <label for="phone">가게 전화번호<span class="required">*</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="예: 02-1234-5678" required />
+          <span class="hint">02-1234-5678 형식으로 입력하세요</span>
+          <span class="error-msg" id="err-phone"></span>
+        </div>
+
+        <div class="form-row">
+          <label for="storeName">상표명<span class="required">*</span></label>
+          <input type="text" id="storeName" name="storeName" maxlength="30" required />
+          <span class="hint">2 ~ 30자 이내로 입력하세요</span>
+          <span class="error-msg" id="err-storeName"></span>
+        </div>
+
+        <div class="form-row">
+          <label for="category">카테고리<span class="required">*</span></label>
+          <select id="category" name="category" required>
+            <option value="">-- 선택하세요 --</option>
+            <option value="korean">한식</option>
+            <option value="chinese">중식</option>
+            <option value="japanese">일식</option>
+            <option value="western">양식</option>
+            <option value="cafe">카페/디저트</option>
+            <option value="etc">기타</option>
+          </select>
+          <span class="error-msg" id="err-category"></span>
+        </div>
+
+        <div class="form-row">
+          <label for="location">위치<span class="required">*</span></label>
+          <input type="text" id="location" name="location" required />
+          <span class="error-msg" id="err-location"></span>
+        </div>
+
+        <div class="form-row">
+          <label for="rating">평점<span class="required">*</span></label>
+          <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" required />
+          <span class="hint">0.0 ~ 5.0 사이의 값</span>
+          <span class="error-msg" id="err-rating"></span>
+        </div>
+
+        <div class="form-row">
+          <label for="hours">영업시간<span class="required">*</span></label>
+          <input type="text" id="hours" name="hours" placeholder="예: 09:00 - 22:00" required />
+          <span class="error-msg" id="err-hours"></span>
+        </div>
+
+        <div class="form-row">
+          <label for="regDate">등록일<span class="required">*</span></label>
+          <input type="date" id="regDate" name="regDate" required />
+          <span class="error-msg" id="err-regDate"></span>
+        </div>
+
+        <div class="form-actions">
+          <a href="#" class="btn btn-secondary" id="cancel-btn">취소</a>
+          <button type="submit" class="btn btn-primary">수정</button>
+        </div>
+      </form>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 맛집 관리 CRUD Study Project</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const id = getQueryParam("id");
+    const item = getItemById(id);
+    const form = document.getElementById("edit-form");
+
+    if (!item) {
+      alert("존재하지 않는 데이터입니다.");
+      window.location.href = "index.html";
+    } else {
+      form.phone.value = item.phone;
+      form.storeName.value = item.name;
+      form.category.value = item.category;
+      form.location.value = item.location;
+      form.rating.value = item.rating;
+      form.hours.value = item.hours;
+      form.regDate.value = item.regDate;
+
+      document.getElementById("cancel-btn").addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = `view.html?id=${item.id}`;
+      });
+    }
+
+    function showError(fieldId, message) {
+      const input = document.getElementById(fieldId);
+      const err = document.getElementById(`err-${fieldId}`);
+      err.textContent = message;
+      input.classList.toggle("invalid", Boolean(message));
+    }
+
+    function validateForm(form) {
+      let valid = true;
+
+      // 1) 필수값 입력 여부
+      ["phone", "storeName", "category", "location", "rating", "hours", "regDate"].forEach((fid) => {
+        if (!form[fid].value.trim()) {
+          showError(fid, "필수 입력 항목입니다.");
+          valid = false;
+        } else {
+          showError(fid, "");
+        }
+      });
+
+      // 2) 문자열 길이 (상표명 2~30자)
+      const storeName = form.storeName.value.trim();
+      if (storeName && (storeName.length < 2 || storeName.length > 30)) {
+        showError("storeName", "상표명은 2 ~ 30자로 입력하세요.");
+        valid = false;
+      }
+
+      // 3) 전화번호 형식 검사
+      const phonePattern = /^0\d{1,2}-\d{3,4}-\d{4}$/;
+      if (form.phone.value && !phonePattern.test(form.phone.value.trim())) {
+        showError("phone", "전화번호 형식이 올바르지 않습니다. (예: 02-1234-5678)");
+        valid = false;
+      }
+
+      // 4) 숫자 범위 (평점 0~5)
+      const rating = Number(form.rating.value);
+      if (form.rating.value && (rating < 0 || rating > 5)) {
+        showError("rating", "평점은 0 ~ 5 사이여야 합니다.");
+        valid = false;
+      }
+
+      // 5) select 선택 여부 (카테고리)
+      if (!form.category.value) {
+        showError("category", "카테고리를 선택하세요.");
+        valid = false;
+      }
+
+      // 6) 날짜 입력 여부 (등록일)
+      if (!form.regDate.value) {
+        showError("regDate", "등록일을 입력하세요.");
+        valid = false;
+      }
+
+      return valid;
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      if (!validateForm(form)) {
+        return;
+      }
+
+      if (confirm("게시물을 수정할까요?")) {
+        updateItem(item.id, {
+          phone: form.phone.value.trim(),
+          name: form.storeName.value.trim(),
+          category: form.category.value,
+          location: form.location.value.trim(),
+          rating: Number(form.rating.value),
+          hours: form.hours.value.trim(),
+          regDate: form.regDate.value,
+        });
+        window.location.href = `view.html?id=${item.id}`;
+      }
+    });
+  </script>
+</body>
+</html>
